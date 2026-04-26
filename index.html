@@ -1,0 +1,2913 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Hub — Adamos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: rgba(20, 20, 30, 0.6);
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.15);
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent: #76b900;
+            --accent-glow: rgba(118, 185, 0, 0.3);
+            --accent-apple: #2997ff;
+            --danger: #ff453a;
+            --success: #30d158;
+            --warning: #ff9f0a;
+            --info: #5ac8fa;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --pin: #ffd60a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            transition: background 0.5s ease;
+        }
+
+        /* Background Themes */
+        .bg-gradient {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -2;
+            transition: all 0.8s ease;
+        }
+        .bg-gradient.theme-default {
+            background: radial-gradient(ellipse at 20% 20%, rgba(118, 185, 0, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(41, 151, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(120, 120, 120, 0.03) 0%, transparent 70%);
+        }
+        .bg-gradient.theme-ocean {
+            background: radial-gradient(ellipse at 10% 10%, rgba(0, 150, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 90%, rgba(0, 200, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 100, 200, 0.05) 0%, transparent 70%);
+        }
+        .bg-gradient.theme-sunset {
+            background: radial-gradient(ellipse at 20% 80%, rgba(255, 100, 50, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 50, 150, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 150, 0, 0.04) 0%, transparent 70%);
+        }
+        .bg-gradient.theme-forest {
+            background: radial-gradient(ellipse at 15% 15%, rgba(50, 200, 100, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 85%, rgba(100, 255, 150, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(50, 150, 80, 0.04) 0%, transparent 70%);
+        }
+        .bg-gradient.theme-cyber {
+            background: radial-gradient(ellipse at 30% 30%, rgba(255, 0, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 70%, rgba(0, 255, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(150, 0, 255, 0.04) 0%, transparent 70%);
+        }
+        .bg-gradient.theme-minimal {
+            background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 70%);
+        }
+
+        .noise {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: rgba(10, 10, 15, 0.7);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.03em;
+            cursor: default;
+            user-select: none;
+            position: relative;
+        }
+        .logo span { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--glass);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #5a9400 100%);
+            border-color: transparent;
+            color: #000;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: rgba(255, 69, 58, 0.1);
+            border-color: rgba(255, 69, 58, 0.3);
+            color: var(--danger);
+        }
+        .btn-danger:hover { background: rgba(255, 69, 58, 0.2); }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 8px; }
+        .btn-icon { padding: 0.4rem; width: 36px; height: 36px; justify-content: center; }
+
+        /* User badge */
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.875rem;
+            background: rgba(41, 151, 255, 0.1);
+            border: 1px solid rgba(41, 151, 255, 0.3);
+            color: var(--accent-apple);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Main */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 3rem 0 2rem;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(135deg, #fff 0%, #86868b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero .made-by {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            margin-bottom: 1.5rem;
+        }
+        .hero p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* Section titles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: -1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+            min-width: 240px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.75rem;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .search-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(118, 185, 0, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .search-box svg {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        .toolbar-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .toolbar-select {
+            padding: 0.6rem 0.875rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .toolbar-select:focus { border-color: var(--accent); }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--glass);
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+        .filter-btn.active {
+            background: rgba(118, 185, 0, 0.15);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .projects-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(118, 185, 0, 0.05) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .project-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            border-color: var(--border-hover);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+        .project-card:hover::before { opacity: 1; }
+
+        .project-card.list-view {
+            display: flex;
+            align-items: stretch;
+            border-radius: 18px;
+        }
+        .project-card.list-view .card-emoji {
+            width: 100px;
+            height: auto;
+            min-height: 100px;
+            font-size: 2.5rem;
+            border-radius: 0;
+        }
+        .project-card.list-view .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .project-card.list-view .card-desc {
+            -webkit-line-clamp: 1;
+        }
+        .project-card.list-view .card-footer {
+            margin-top: 0.5rem;
+        }
+
+        .card-emoji {
+            width: 100%;
+            height: 170px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .project-card:hover .card-emoji { transform: scale(1.08); }
+        .card-emoji::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(to top, rgba(10,10,15,0.8) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .card-body {
+            padding: 1.25rem 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        .card-meta {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .card-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.65rem;
+            background: rgba(118, 185, 0, 0.1);
+            color: var(--accent);
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .card-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.55rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 100px;
+        }
+        .card-status.live { background: rgba(48, 209, 88, 0.1); color: var(--success); }
+        .card-status.beta { background: rgba(255, 159, 10, 0.1); color: var(--warning); }
+        .card-status.dev { background: rgba(90, 200, 250, 0.1); color: var(--info); }
+        .card-status.archived { background: rgba(134, 134, 139, 0.1); color: var(--text-secondary); }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.02em;
+            cursor: pointer;
+        }
+        .card-title:hover { color: var(--accent); }
+        .card-desc {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.55;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 0.6rem;
+        }
+        .card-tags {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.6rem;
+        }
+        .card-tag {
+            padding: 0.12rem 0.45rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .card-author {
+            padding: 0.12rem 0.45rem;
+            background: rgba(41, 151, 255, 0.08);
+            border: 1px solid rgba(41, 151, 255, 0.2);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--accent-apple);
+            font-weight: 600;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.6rem;
+            border-top: 1px solid var(--border);
+        }
+        .card-actions {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+        .card-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+        .card-action-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+        .card-action-btn.pin-btn:hover, .card-action-btn.pinned {
+            color: var(--pin);
+            background: rgba(255, 214, 10, 0.1);
+        }
+        .card-date {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .card-views {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        /* Pin badge */
+        .pin-badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            z-index: 10;
+            background: rgba(255, 214, 10, 0.15);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            color: var(--pin);
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+        .project-card.pinned .pin-badge { display: flex; align-items: center; gap: 0.25rem; }
+
+        /* Admin Controls */
+        .card-admin {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            display: none;
+            gap: 0.4rem;
+            z-index: 10;
+        }
+        .project-card:hover .card-admin { display: flex; }
+        .admin-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+        .admin-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
+        .admin-btn.delete:hover { background: var(--danger); border-color: var(--danger); }
+        .admin-btn.archive:hover { background: var(--warning); border-color: var(--warning); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal {
+            background: linear-gradient(145deg, rgba(25, 25, 35, 0.98) 0%, rgba(15, 15, 25, 0.99) 100%);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            width: 100%;
+            max-width: 620px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-overlay.active .modal { transform: scale(1); }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.2s ease;
+        }
+        .modal-close:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(118, 185, 0, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .form-textarea { resize: vertical; min-height: 100px; }
+        .form-hint {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.375rem;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Emoji Picker */
+        .emoji-preview {
+            width: 100%;
+            height: 90px;
+            border-radius: 16px;
+            border: 2px dashed var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 0.5rem;
+        }
+        .emoji-preview:hover { border-color: var(--accent); background: rgba(118, 185, 0, 0.05); }
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 0.35rem;
+            max-height: 170px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+        .emoji-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
+        .emoji-item:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.25); }
+        .emoji-item.selected { background: rgba(118, 185, 0, 0.2); box-shadow: 0 0 0 2px var(--accent); }
+
+        /* Theme Selector */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+        .theme-option {
+            aspect-ratio: 16/10;
+            border-radius: 14px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .theme-option:hover { border-color: var(--border-hover); transform: scale(1.05); }
+        .theme-option.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(118, 185, 0, 0.2); }
+        .theme-option .theme-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.5rem;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Auth */
+        .auth-tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .auth-tab {
+            padding: 0.5rem 1.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .auth-tab.active {
+            background: var(--accent);
+            color: #000;
+            border-color: transparent;
+        }
+        .auth-tab:hover:not(.active) {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+        }
+
+        /* Login */
+        .login-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, var(--accent) 0%, #5a9400 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            box-shadow: 0 8px 32px var(--accent-glow);
+        }
+        .login-title { text-align: center; margin-bottom: 0.5rem; }
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+        .empty-state-icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.5; }
+        .empty-state h3 { color: var(--text-primary); margin-bottom: 0.5rem; font-weight: 700; }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            background: linear-gradient(145deg, rgba(35, 35, 45, 0.98) 0%, rgba(25, 25, 35, 0.99) 100%);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 400px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-color: rgba(48, 209, 88, 0.3); }
+        .toast.error { border-color: rgba(255, 69, 58, 0.3); }
+
+        /* Admin Badge */
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.875rem;
+            background: rgba(118, 185, 0, 0.1);
+            border: 1px solid rgba(118, 185, 0, 0.3);
+            color: var(--accent);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Feedback Section */
+        .feedback-section {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        .feedback-section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        .feedback-btn {
+            padding: 0.65rem 1.75rem;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .feedback-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Messages */
+        .messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .message-item {
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            text-align: left;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .message-item:hover { border-color: var(--border-hover); background: rgba(255, 255, 255, 0.04); }
+        .message-item.unread { border-left: 3px solid var(--accent); }
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .message-type {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+        }
+        .message-type.idea { background: rgba(118, 185, 0, 0.1); color: var(--accent); }
+        .message-type.bug { background: rgba(255, 69, 58, 0.1); color: var(--danger); }
+        .message-type.other { background: rgba(90, 200, 250, 0.1); color: var(--info); }
+        .message-date { font-size: 0.7rem; color: var(--text-secondary); }
+        .message-text { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; }
+        .message-delete {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        .message-item:hover .message-delete { opacity: 1; }
+        .message-delete:hover { background: rgba(255, 69, 58, 0.1); color: var(--danger); }
+        .messages-empty { text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.9rem; }
+        .messages-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--danger);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+        /* Confetti */
+        .confetti-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Keyboard shortcut hint */
+        .kbd-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.4rem;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-family: monospace;
+            color: var(--text-secondary);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .pulse { animation: pulse 2s ease-in-out infinite; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content { flex-wrap: wrap; gap: 1rem; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2rem; }
+            .container { padding: 1rem; }
+            .modal { padding: 1.5rem; margin: 1rem; }
+            .theme-grid { grid-template-columns: repeat(2, 1fr); }
+            .emoji-grid { grid-template-columns: repeat(8, 1fr); }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .search-box { max-width: 100%; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+        }
+
+        input[type="file"] { display: none; }
+
+        /* Hidden login hint */
+        .login-hint {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.08);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Detail modal */
+        .detail-emoji {
+            font-size: 5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .detail-meta {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .detail-desc {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .detail-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .detail-link-btn {
+            padding: 0.75rem 2rem;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent) 0%, #5a9400 100%);
+            color: #000;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .detail-link-btn:hover {
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        /* Tutorial content */
+        .tutorial-content {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            background: rgba(255,255,255,0.02);
+            padding: 1.25rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+    </style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body>
+    <div class="bg-gradient theme-default" id="bgGradient"></div>
+    <div class="noise"></div>
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo" id="logo">Central<span>.</span>Hub</div>
+            <div class="header-actions">
+                <!-- Guest actions -->
+                <div id="guestActions" style="display:flex;gap:0.5rem;align-items:center">
+                    <button class="btn btn-sm" onclick="openAuth('login')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        Prihlásiť sa
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="openAuth('register')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                        Registrovať sa
+                    </button>
+                </div>
+
+                <!-- Logged in actions -->
+                <div id="userActions" style="display:none;gap:0.5rem;align-items:center">
+                    <div class="user-badge" id="userBadge">
+                        <span>👤</span>
+                        <span id="userName">User</span>
+                    </div>
+
+                    <div id="adminOnlyActions" style="display:none;gap:0.5rem;align-items:center">
+                        <div class="admin-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Admin
+                        </div>
+                        <button class="btn btn-sm" id="btnAddTutorial" onclick="openAddTutorialModal()" title="Pridať tutoriál">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Tutoriál
+                        </button>
+                        <button class="btn btn-icon" id="btnMessages" onclick="openMessagesModal()" title="Správy">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <span class="messages-badge" id="messagesBadge" style="display:none">0</span>
+                        </button>
+                        <button class="btn btn-icon" id="btnBackup" onclick="exportBackup()" title="Export">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        </button>
+                        <button class="btn btn-icon" id="btnRestore" onclick="document.getElementById('importFile').click()" title="Import">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </button>
+                        <input type="file" id="importFile" accept=".json" onchange="importBackup(this)">
+                    </div>
+
+                    <button class="btn btn-primary btn-sm" id="btnAdd" onclick="openAddModal()" title="Pridať projekt">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Pridať
+                    </button>
+                    <button class="btn btn-sm" id="btnLogout" onclick="logout()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Odhlásiť
+                    </button>
+                </div>
+
+                <button class="btn btn-icon" id="btnTheme" onclick="openThemeModal()" title="Zmeniť pozadie">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Project/Tools</h1>
+            <div class="made-by">Made by Adamos</div>
+            <p>Osobný dashboard, komunitné projekty a tutoriály na jednom mieste.</p>
+        </section>
+
+        <!-- Adam's Projects -->
+        <section id="adamSection" style="margin-bottom:3rem;display:none">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">🚀 Práve vytvorené — Adam</h2>
+                    <p class="section-subtitle">Najnovšie webové aplikácie a experimenty priamo odomňa.</p>
+                </div>
+            </div>
+            <div class="projects-grid" id="adamProjectsGrid"></div>
+        </section>
+
+        <!-- Tutorials -->
+        <section id="tutorialsSection" style="margin-bottom:3rem;display:none">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">🛠️ Vytvor si vlastnú stránku</h2>
+                    <p class="section-subtitle">Tutoriály, návody a tipy ako začať s vlastným projektom.</p>
+                </div>
+            </div>
+            <div class="projects-grid" id="tutorialsGrid"></div>
+        </section>
+
+        <!-- Community Projects -->
+        <section id="communitySection">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">🌐 Komunitné projekty</h2>
+                    <p class="section-subtitle">Projekty od komunity. Pridaj aj ty svoj vlastný!</p>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="searchInput" placeholder="Hľadať v komunitných projektoch..." oninput="handleSearch()">
+                </div>
+                <div class="toolbar-group">
+                    <select class="toolbar-select" id="sortSelect" onchange="handleSort()">
+                        <option value="newest">📅 Najnovšie</option>
+                        <option value="oldest">📅 Najstaršie</option>
+                        <option value="name">🔤 Názov A-Z</option>
+                        <option value="nameDesc">🔤 Názov Z-A</option>
+                        <option value="views">👁️ Najviac zobrazení</option>
+                    </select>
+                    <button class="btn btn-icon" id="viewToggle" onclick="toggleView()" title="Zmeniť zobrazenie">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="filters" id="filters"></div>
+
+            <div class="projects-grid" id="projectsGrid"></div>
+
+            <div class="empty-state" id="emptyState" style="display:none">
+                <div class="empty-state-icon">📂</div>
+                <h3>Zatiaľ žiadne projekty</h3>
+                <p>Pridaj svoj prvý projekt cez tlačidlo „Pridať“.</p>
+            </div>
+        </section>
+
+        <div class="feedback-section">
+            <h3>💡 Máš nápad?</h3>
+            <button class="feedback-btn" onclick="openFeedbackModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Poslať nápad
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <p>Central Hub — osobný dashboard pre projekty a experimenty.</p>
+        <p style="margin-top:0.5rem;opacity:0.6">Built with passion by Adamos</p>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal" style="max-width:420px">
+            <div class="login-icon" id="authIcon">🔐</div>
+            <h2 class="modal-title login-title" id="authTitle">Prihlásenie</h2>
+            <p class="login-subtitle" id="authSubtitle">Zadaj svoje prihlasovacie údaje.</p>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="switchAuth('login')">Prihlásiť sa</button>
+                <button class="auth-tab" id="tabRegister" onclick="switchAuth('register')">Registrovať sa</button>
+            </div>
+
+            <form id="loginForm" onsubmit="doLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Používateľské meno</label>
+                    <input type="text" class="form-input" id="loginUsername" placeholder="adam" required onkeypress="if(event.key==='Enter')doLogin(event)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Heslo</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="••••••" required onkeypress="if(event.key==='Enter')doLogin(event)">
+                </div>
+                <div class="modal-actions" style="justify-content:center;margin-top:1rem;padding-top:0;border:none">
+                    <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:0.875rem">Prihlásiť sa</button>
+                </div>
+            </form>
+
+            <form id="registerForm" onsubmit="doRegister(event)" style="display:none">
+                <div class="form-group">
+                    <label class="form-label">Používateľské meno *</label>
+                    <input type="text" class="form-input" id="regUsername" placeholder="tvoje_meno" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Zobrazované meno</label>
+                    <input type="text" class="form-input" id="regDisplayName" placeholder="Tvoje Meno">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Heslo *</label>
+                    <input type="password" class="form-input" id="regPassword" placeholder="••••••" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Potvrď heslo *</label>
+                    <input type="password" class="form-input" id="regPassword2" placeholder="••••••" required>
+                </div>
+                <div class="modal-actions" style="justify-content:center;margin-top:1rem;padding-top:0;border:none">
+                    <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:0.875rem">Vytvoriť účet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Project Modal -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Nový projekt</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="projectForm" onsubmit="saveProject(event)">
+                <input type="hidden" id="projectId">
+                <div class="form-group">
+                    <label class="form-label">Emoji *</label>
+                    <div class="emoji-preview" id="emojiPreview" onclick="toggleEmojiPicker()">🚀</div>
+                    <div class="emoji-grid" id="emojiGrid" style="display:none"></div>
+                    <input type="hidden" id="projectEmoji" value="🚀">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Názov projektu *</label>
+                    <input type="text" class="form-input" id="projectTitle" placeholder="napr. Moja Portfolio Stránka" required oninput="autoDetectEmoji(this.value)">
+                    <p class="form-hint">Napíš napr. "PC", "web", "app" — emoji sa vyberie automaticky</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Kategória</label>
+                    <select class="form-select" id="projectCategory">
+                        <option value="Web">🌐 Web</option>
+                        <option value="App">📱 App</option>
+                        <option value="Design">🎨 Design</option>
+                        <option value="Experiment">🔬 Experiment</option>
+                        <option value="E-shop">🛒 E-shop</option>
+                        <option value="Blog">📝 Blog</option>
+                        <option value="Hra">🎮 Hra</option>
+                        <option value="Tool">🔧 Tool</option>
+                        <option value="Ostatné">📦 Ostatné</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="projectStatus">
+                        <option value="live">🟢 Live — aktívny projekt</option>
+                        <option value="beta">🟡 Beta — v testovaní</option>
+                        <option value="dev">🔵 Dev — vo vývoji</option>
+                        <option value="archived">⚪ Archivovaný</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Popis</label>
+                    <textarea class="form-textarea" id="projectDesc" placeholder="Podrobný popis projektu — čo robí, prečo som ho vytvoril, aké technológie používa, kto je cieľová skupina..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tagy (oddelené čiarkou)</label>
+                    <input type="text" class="form-input" id="projectTags" placeholder="napr. React, Node.js, API, OpenAI">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Odkaz na projekt *</label>
+                    <input type="url" class="form-input" id="projectLink" placeholder="https://mojprojekt.sk" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeModal()">Zrušiť</button>
+                    <button type="submit" class="btn btn-primary">Uložiť projekt</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal" style="max-width:520px">
+            <div class="modal-header">
+                <h2 class="modal-title" id="detailTitle">Detail</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="detail-emoji" id="detailEmoji">🚀</div>
+            <div class="detail-meta" id="detailMeta"></div>
+            <div class="detail-desc" id="detailDesc"></div>
+            <div class="detail-actions">
+                <button class="detail-link-btn" id="detailLinkBtn" onclick="openDetailLink()">
+                    Navštíviť stránku
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+                </button>
+                <button class="btn" onclick="copyDetailLink()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Kopírovať link
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Modal -->
+    <div class="modal-overlay" id="themeModal">
+        <div class="modal" style="max-width:480px">
+            <div class="modal-header">
+                <h2 class="modal-title">🎨 Pozadie</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Vyber štýl pozadia</label>
+                <div class="theme-grid" id="themeGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div class="modal-overlay" id="feedbackModal">
+        <div class="modal" style="max-width:500px">
+            <div class="modal-header">
+                <h2 class="modal-title">💡 Máš nápad?</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="feedbackForm" onsubmit="sendFeedback(event)">
+                <div class="form-group">
+                    <label class="form-label">Typ</label>
+                    <select class="form-select" id="feedbackType">
+                        <option value="idea">💡 Nápad na novú stránku / tool</option>
+                        <option value="bug">🐛 Nahlásiť chybu</option>
+                        <option value="other">💬 Iné</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tvoja správa *</label>
+                    <textarea class="form-textarea" id="feedbackText" placeholder="Opíš svoj nápad čo najpodrobnejšie..." required style="min-height:140px"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeModal()">Zrušiť</button>
+                    <button type="submit" class="btn btn-primary">Odoslať</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Messages Modal -->
+    <div class="modal-overlay" id="messagesModal">
+        <div class="modal" style="max-width:600px">
+            <div class="modal-header">
+                <h2 class="modal-title">📨 Správy a nápady</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="messages-list" id="messagesList"></div>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal (Add/Edit) -->
+    <div class="modal-overlay" id="tutorialModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="tutModalTitle">Nový tutoriál</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="tutorialForm" onsubmit="saveTutorial(event)">
+                <input type="hidden" id="tutorialId">
+                <div class="form-group">
+                    <label class="form-label">Emoji *</label>
+                    <div class="emoji-preview" id="tutEmojiPreview" onclick="toggleTutorialEmojiPicker()">📚</div>
+                    <div class="emoji-grid" id="tutEmojiGrid" style="display:none"></div>
+                    <input type="hidden" id="tutorialEmoji" value="📚">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Názov tutoriálu *</label>
+                    <input type="text" class="form-input" id="tutorialTitle" placeholder="napr. Ako vytvoriť portfolio za 10 minút" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Krátky popis</label>
+                    <input type="text" class="form-input" id="tutorialDesc" placeholder="O čom tento tutoriál je...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Obsah / Kroky *</label>
+                    <textarea class="form-textarea" id="tutorialContent" placeholder="1. Najprv si priprav...&#10;2. Potom nainštaluj...&#10;3. ..." required style="min-height:200px"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Kategória</label>
+                    <select class="form-select" id="tutorialCategory">
+                        <option value="Začiatočník">🌱 Začiatočník</option>
+                        <option value="Pokročilý">🚀 Pokročilý</option>
+                        <option value="Tipy & Triky">💡 Tipy & Triky</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tagy (oddelené čiarkou)</label>
+                    <input type="text" class="form-input" id="tutorialTags" placeholder="napr. HTML, CSS, Začiatky">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeModal()">Zrušiť</button>
+                    <button type="submit" class="btn btn-primary">Uložiť tutoriál</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tutorial Detail Modal -->
+    <div class="modal-overlay" id="tutorialDetailModal">
+        <div class="modal" style="max-width:640px">
+            <div class="modal-header">
+                <h2 class="modal-title" id="tutDetailTitle">Tutoriál</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="detail-emoji" id="tutDetailEmoji">📚</div>
+            <div class="detail-meta" id="tutDetailMeta"></div>
+            <div class="tutorial-content" id="tutDetailContent"></div>
+        </div>
+    </div>
+
+    <!-- Shortcuts Modal -->
+    <div class="modal-overlay" id="shortcutsModal">
+        <div class="modal" style="max-width:420px">
+            <div class="modal-header">
+                <h2 class="modal-title">⌨️ Skratky</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:rgba(255,255,255,0.02);border-radius:12px;border:1px solid var(--border)">
+                    <span>Hľadať</span>
+                    <span class="kbd-hint">Ctrl K</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:rgba(255,255,255,0.02);border-radius:12px;border:1px solid var(--border)">
+                    <span>Prihlásenie</span>
+                    <span class="kbd-hint">Ctrl Shift A</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:rgba(255,255,255,0.02);border-radius:12px;border:1px solid var(--border)">
+                    <span>Zatvoriť modal</span>
+                    <span class="kbd-hint">Esc</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:rgba(255,255,255,0.02);border-radius:12px;border:1px solid var(--border)">
+                    <span>Nový projekt</span>
+                    <span class="kbd-hint">N</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="login-hint">Ctrl+Shift+A</div>
+
+    <script>
+        // ============ CONFIG ============
+        const ADMIN_PASSWORD = 'admin123';
+        const STORAGE_KEY = 'centralhub_projects';
+        const THEME_KEY = 'centralhub_theme';
+        const MESSAGES_KEY = 'centralhub_messages';
+        const USERS_KEY = 'centralhub_users';
+        const TUTORIALS_KEY = 'centralhub_tutorials';
+
+        const EMOJIS = [
+            '🚀','💻','🌐','📱','🎨','🔬','🛒','📝','🎮','📦',
+            '⚡','🔥','💡','🎯','🏆','⭐','🌟','💎','🔮','🎪',
+            '🏠','🏢','🌍','🌙','☀️','🌈','🔧','⚙️','🔌','📡',
+            '🎵','🎬','📸','🎤','🎧','🎹','🎸','🥁','🎺','🎻',
+            '🚗','✈️','🚢','🚀','🛸','🚁','🏍️','🚲','🛴','🚂',
+            '🐶','🐱','🦊','🐼','🐨','🐯','🦁','🐮','🐷','🐸',
+            '🌵','🌲','🌳','🌴','🌱','🌿','☘️','🍀','🍁','🍄',
+            '🍎','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒',
+            '⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🏓','🏸',
+            '❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💖',
+            '👨‍💻','👩‍💻','🤖','👾','🕹️','💾','💿','📀','🖥️','⌨️',
+            '📊','📈','📉','🗂️','📁','📂','🗃️','📝','✏️','📌',
+            '🔒','🔓','🔑','🗝️','🛡️','⚔️','🏹','🔫','💣','🧨',
+            '📚','📖','✂️','🧰','🧪','🧬','🔭','🧮','🗺️','🧭'
+        ];
+
+        const EMOJI_MAP = {
+            'pc': '💻', 'computer': '💻', 'laptop': '💻', 'desktop': '🖥️',
+            'web': '🌐', 'website': '🌐', 'stranka': '🌐', 'stránka': '🌐', 'site': '🌐',
+            'app': '📱', 'aplikacia': '📱', 'aplikácia': '📱', 'mobile': '📱', 'ios': '📱', 'android': '📱',
+            'design': '🎨', 'grafika': '🎨', 'ui': '🎨', 'ux': '🎨', 'figma': '🎨',
+            'experiment': '🔬', 'test': '🔬', 'demo': '🔬', 'prototype': '🔬',
+            'shop': '🛒', 'eshop': '🛒', 'e-shop': '🛒', 'store': '🛒', 'obchod': '🛒',
+            'blog': '📝', 'clanok': '📝', 'článok': '📝', 'news': '📝', 'article': '📝',
+            'game': '🎮', 'hra': '🎮', 'gaming': '🎮', 'play': '🎮',
+            'tool': '🔧', 'nastroj': '🔧', 'nástroj': '🔧', 'utility': '🔧', 'script': '🔧',
+            'api': '⚙️', 'backend': '⚙️', 'server': '🖥️', 'database': '💾',
+            'ai': '🤖', 'openai': '🤖', 'chatgpt': '🤖', 'ml': '🤖', 'machine learning': '🤖',
+            'crypto': '💎', 'bitcoin': '💎', 'blockchain': '💎', 'nft': '💎',
+            'video': '🎬', 'film': '🎬', 'movie': '🎬', 'youtube': '🎬',
+            'music': '🎵', 'song': '🎵', 'audio': '🎵', 'spotify': '🎵',
+            'photo': '📸', 'image': '📸', 'gallery': '📸', 'foto': '📸',
+            'map': '🌍', 'travel': '✈️', 'trip': '✈️', 'location': '🌍',
+            'weather': '☀️', 'forecast': '☀️', 'climate': '☀️',
+            'chat': '💬', 'message': '💬', 'social': '💬', 'community': '💬',
+            'security': '🔒', 'password': '🔒', 'encrypt': '🔒', 'vpn': '🔒',
+            'finance': '📈', 'money': '💰', 'bank': '🏦', 'invest': '📈',
+            'education': '📚', 'learn': '📚', 'course': '📚', 'school': '📚',
+            'health': '❤️', 'fitness': '💪', 'sport': '⚽', 'gym': '💪',
+            'food': '🍕', 'recipe': '🍳', 'cook': '🍳', 'restaurant': '🍽️',
+            'car': '🚗', 'auto': '🚗', 'vehicle': '🚗', 'drive': '🚗',
+            'home': '🏠', 'house': '🏠', 'real estate': '🏠', 'byt': '🏠',
+            'portfolio': '💼', 'cv': '📄', 'resume': '📄', 'work': '💼',
+            'dashboard': '📊', 'analytics': '📈', 'stats': '📊',
+            'calendar': '📅', 'event': '📅', 'plan': '📅',
+            'mail': '📧', 'email': '📧', 'newsletter': '📧',
+            'cloud': '☁️', 'storage': '☁️', 'backup': '☁️',
+            'code': '💻', 'programming': '💻', 'dev': '💻', 'developer': '👨‍💻',
+            'tutorial': '📚', 'navod': '📚', 'návod': '📚', 'guide': '📚', 'howto': '📚'
+        };
+
+        const THEMES = [
+            { id: 'theme-default', name: 'Default', preview: 'linear-gradient(135deg, #76b90033, #2997ff22)' },
+            { id: 'theme-ocean', name: 'Ocean', preview: 'linear-gradient(135deg, #0096ff33, #00c8ff22)' },
+            { id: 'theme-sunset', name: 'Sunset', preview: 'linear-gradient(135deg, #ff643233, #ff329622)' },
+            { id: 'theme-forest', name: 'Forest', preview: 'linear-gradient(135deg, #32c86433, #64ff9622)' },
+            { id: 'theme-cyber', name: 'Cyber', preview: 'linear-gradient(135deg, #ff00ff33, #00ffff22)' },
+            { id: 'theme-minimal', name: 'Minimal', preview: 'linear-gradient(135deg, #ffffff11, #ffffff05)' }
+        ];
+
+        // ============ STATE ============
+        let projects = [];
+        let tutorials = [];
+        let users = [];
+        let messages = [];
+        let currentUser = null;
+        let isAdmin = false;
+        let currentFilter = 'Všetky';
+        let editingId = null;
+        let editingTutorialId = null;
+        let currentTheme = 'theme-default';
+        let emojiPickerOpen = false;
+        let tutEmojiPickerOpen = false;
+        let logoClicks = 0;
+        let logoClickTimer = null;
+        let currentView = 'grid';
+        let currentSort = 'newest';
+        let searchQuery = '';
+        let currentDetailId = null;
+        let currentAuthTab = 'login';
+
+        // ============ INIT ============
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+            loadProjects();
+            loadTutorials();
+            loadMessages();
+            loadTheme();
+            loadSession();
+
+            renderAdamProjects();
+            renderTutorials();
+            renderFilters();
+            renderProjects();
+            renderThemes();
+            updateMessagesBadge();
+            updateUIForUser();
+
+            // Secret login: triple-click logo
+            document.getElementById('logo').addEventListener('click', () => {
+                logoClicks++;
+                if (!logoClickTimer) {
+                    logoClickTimer = setTimeout(() => { logoClicks = 0; logoClickTimer = null; }, 800);
+                }
+                if (logoClicks >= 3) {
+                    logoClicks = 0;
+                    clearTimeout(logoClickTimer);
+                    logoClickTimer = null;
+                    openAuth('login');
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                    e.preventDefault();
+                    openAuth('login');
+                }
+                if (e.ctrlKey && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+                if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                    document.getElementById('shortcutsModal').classList.add('active');
+                }
+                if (e.key === 'n' && currentUser && !isTyping()) {
+                    e.preventDefault();
+                    if (isAdmin) {
+                        openAddModal();
+                    } else {
+                        openAddModal();
+                    }
+                }
+            });
+        });
+
+        function isTyping() {
+            const active = document.activeElement;
+            return active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        }
+
+        // ============ USERS & AUTH ============
+        function loadUsers() {
+            const stored = localStorage.getItem(USERS_KEY);
+            users = stored ? JSON.parse(stored) : [];
+
+            // Ensure default admin exists
+            if (!users.find(u => u.username === 'adam')) {
+                users.push({
+                    id: 'user_adam_' + Date.now(),
+                    username: 'adam',
+                    password: 'admin123',
+                    displayName: 'Adam',
+                    role: 'admin',
+                    createdAt: new Date().toISOString()
+                });
+                localStorage.setItem(USERS_KEY, JSON.stringify(users));
+            }
+        }
+
+        function saveUsers() {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function loadSession() {
+            const session = sessionStorage.getItem('ch_user_session');
+            if (session) {
+                try {
+                    currentUser = JSON.parse(session);
+                    isAdmin = currentUser.role === 'admin';
+                } catch(e) {
+                    currentUser = null;
+                    isAdmin = false;
+                }
+            }
+        }
+
+        function openAuth(tab) {
+            currentAuthTab = tab;
+            document.getElementById('authModal').classList.add('active');
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('authTitle').textContent = tab === 'login' ? 'Prihlásenie' : 'Registrácia';
+            document.getElementById('authSubtitle').textContent = tab === 'login' ? 'Zadaj svoje prihlasovacie údaje.' : 'Vytvor si nový účet.';
+            setTimeout(() => {
+                if (tab === 'login') document.getElementById('loginUsername').focus();
+                else document.getElementById('regUsername').focus();
+            }, 100);
+        }
+
+        function switchAuth(tab) {
+            openAuth(tab);
+        }
+
+        function doLogin(e) {
+            if (e) e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = { ...user };
+                delete currentUser.password;
+                isAdmin = user.role === 'admin';
+                sessionStorage.setItem('ch_user_session', JSON.stringify(currentUser));
+                updateUIForUser();
+                closeModal();
+                showToast(`Vitaj späť, ${user.displayName || user.username}!`, 'success');
+                renderAdamProjects();
+                renderTutorials();
+                renderProjects();
+                document.getElementById('loginForm').reset();
+            } else {
+                showToast('Nesprávne meno alebo heslo!', 'error');
+                document.getElementById('loginPassword').value = '';
+            }
+        }
+
+        function doRegister(e) {
+            if (e) e.preventDefault();
+            const username = document.getElementById('regUsername').value.trim().toLowerCase();
+            const displayName = document.getElementById('regDisplayName').value.trim() || username;
+            const password = document.getElementById('regPassword').value;
+            const password2 = document.getElementById('regPassword2').value;
+
+            if (!username || !password) {
+                showToast('Vyplň povinné polia!', 'error');
+                return;
+            }
+            if (password !== password2) {
+                showToast('Heslá sa nezhodujú!', 'error');
+                return;
+            }
+            if (users.find(u => u.username === username)) {
+                showToast('Toto používateľské meno už existuje!', 'error');
+                return;
+            }
+            if (password.length < 4) {
+                showToast('Heslo musí mať aspoň 4 znaky!', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: 'user_' + Date.now(),
+                username,
+                password,
+                displayName,
+                role: 'user',
+                createdAt: new Date().toISOString()
+            };
+            users.push(newUser);
+            saveUsers();
+
+            // Auto login
+            currentUser = { ...newUser };
+            delete currentUser.password;
+            isAdmin = false;
+            sessionStorage.setItem('ch_user_session', JSON.stringify(currentUser));
+
+            updateUIForUser();
+            closeModal();
+            showToast('Účet vytvorený! Vitaj!', 'success');
+            renderAdamProjects();
+            renderTutorials();
+            renderProjects();
+            document.getElementById('registerForm').reset();
+        }
+
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            sessionStorage.removeItem('ch_user_session');
+            updateUIForUser();
+            showToast('Odhlásený.', 'success');
+            renderAdamProjects();
+            renderTutorials();
+            renderProjects();
+        }
+
+        function updateUIForUser() {
+            const guestActions = document.getElementById('guestActions');
+            const userActions = document.getElementById('userActions');
+            const adminOnlyActions = document.getElementById('adminOnlyActions');
+            const userName = document.getElementById('userName');
+            const btnAdd = document.getElementById('btnAdd');
+            const btnAddTutorial = document.getElementById('btnAddTutorial');
+
+            if (currentUser) {
+                guestActions.style.display = 'none';
+                userActions.style.display = 'flex';
+                userName.textContent = currentUser.displayName || currentUser.username;
+
+                if (isAdmin) {
+                    adminOnlyActions.style.display = 'flex';
+                    document.body.classList.add('admin-mode');
+                    btnAdd.style.display = 'inline-flex';
+                    if (btnAddTutorial) btnAddTutorial.style.display = 'inline-flex';
+                } else {
+                    adminOnlyActions.style.display = 'none';
+                    document.body.classList.remove('admin-mode');
+                    btnAdd.style.display = 'inline-flex';
+                    if (btnAddTutorial) btnAddTutorial.style.display = 'none';
+                }
+            } else {
+                guestActions.style.display = 'flex';
+                userActions.style.display = 'none';
+                adminOnlyActions.style.display = 'none';
+                document.body.classList.remove('admin-mode');
+            }
+        }
+
+        function canEditProject(project) {
+            if (!currentUser) return false;
+            if (isAdmin) return true;
+            return project.authorId === currentUser.id;
+        }
+
+        // ============ DATA ============
+        function loadProjects() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    projects = JSON.parse(stored);
+                    const adminId = users.find(u => u.role === 'admin')?.id;
+                    // Migrate old data
+                    projects.forEach(p => {
+                        if (!p.views) p.views = 0;
+                        if (!p.pinned) p.pinned = false;
+                        if (!p.authorId) {
+                            p.authorId = adminId || 'admin';
+                            p.authorName = 'Adam';
+                            p.type = 'mine';
+                        }
+                        if (!p.type) {
+                            p.type = (p.authorId === adminId) ? 'mine' : 'community';
+                        }
+                    });
+                    saveProjects();
+                } catch(e) { projects = []; }
+            }
+        }
+
+        function saveProjects() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+        }
+
+        function loadTutorials() {
+            const stored = localStorage.getItem(TUTORIALS_KEY);
+            if (stored) {
+                try { tutorials = JSON.parse(stored); } catch(e) { tutorials = []; }
+            }
+        }
+
+        function saveTutorials() {
+            localStorage.setItem(TUTORIALS_KEY, JSON.stringify(tutorials));
+        }
+
+        function loadMessages() {
+            const stored = localStorage.getItem(MESSAGES_KEY);
+            if (stored) {
+                try { messages = JSON.parse(stored); } catch(e) { messages = []; }
+            }
+        }
+
+        function saveMessages() {
+            localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
+            updateMessagesBadge();
+        }
+
+        function loadTheme() {
+            const stored = localStorage.getItem(THEME_KEY);
+            if (stored) {
+                currentTheme = stored;
+                document.getElementById('bgGradient').className = 'bg-gradient ' + currentTheme;
+            }
+        }
+
+        function saveTheme(themeId) {
+            currentTheme = themeId;
+            localStorage.setItem(THEME_KEY, themeId);
+            document.getElementById('bgGradient').className = 'bg-gradient ' + themeId;
+            renderThemes();
+            showToast('Pozadie zmenené!', 'success');
+        }
+
+        // ============ SEARCH & SORT & VIEW ============
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            renderProjects();
+        }
+
+        function handleSort() {
+            currentSort = document.getElementById('sortSelect').value;
+            renderProjects();
+        }
+
+        function toggleView() {
+            currentView = currentView === 'grid' ? 'list' : 'grid';
+            const btn = document.getElementById('viewToggle');
+            btn.innerHTML = currentView === 'grid'
+                ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>'
+                : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>';
+            renderProjects();
+        }
+
+        function getCommunityProjects() {
+            const adminId = users.find(u => u.role === 'admin')?.id;
+            let filtered = projects.filter(p => p.type === 'community' || (p.authorId && p.authorId !== adminId));
+
+            if (currentFilter !== 'Všetky') {
+                filtered = filtered.filter(p => p.category === currentFilter);
+            }
+
+            if (searchQuery) {
+                filtered = filtered.filter(p =>
+                    p.title.toLowerCase().includes(searchQuery) ||
+                    (p.description || '').toLowerCase().includes(searchQuery) ||
+                    (p.tags || '').toLowerCase().includes(searchQuery) ||
+                    (p.category || '').toLowerCase().includes(searchQuery) ||
+                    (p.authorName || '').toLowerCase().includes(searchQuery)
+                );
+            }
+
+            filtered = [...filtered].sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+
+                switch(currentSort) {
+                    case 'newest': return new Date(b.date) - new Date(a.date);
+                    case 'oldest': return new Date(a.date) - new Date(b.date);
+                    case 'name': return a.title.localeCompare(b.title);
+                    case 'nameDesc': return b.title.localeCompare(a.title);
+                    case 'views': return (b.views || 0) - (a.views || 0);
+                    default: return 0;
+                }
+            });
+
+            return filtered;
+        }
+
+        function getAdamProjects() {
+            const adminId = users.find(u => u.role === 'admin')?.id;
+            return projects.filter(p => p.type === 'mine' || p.authorId === adminId)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        function updateMessagesBadge() {
+            const badge = document.getElementById('messagesBadge');
+            const unread = messages.filter(m => !m.read).length;
+            if (unread > 0) {
+                badge.textContent = unread;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // ============ AUTO EMOJI ============
+        function autoDetectEmoji(text) {
+            if (!text) return;
+            const lower = text.toLowerCase();
+            for (const [keyword, emoji] of Object.entries(EMOJI_MAP)) {
+                if (lower.includes(keyword)) {
+                    document.getElementById('projectEmoji').value = emoji;
+                    document.getElementById('emojiPreview').textContent = emoji;
+                    return;
+                }
+            }
+        }
+
+        // ============ RENDER ADAM PROJECTS ============
+        function renderAdamProjects() {
+            const container = document.getElementById('adamProjectsGrid');
+            const section = document.getElementById('adamSection');
+            const adamProjects = getAdamProjects();
+
+            if (adamProjects.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = 'block';
+
+            container.innerHTML = adamProjects.map((p, i) => {
+                const statusClass = p.status || 'live';
+                const statusLabel = { live: 'Live', beta: 'Beta', dev: 'Dev', archived: 'Archív' }[statusClass];
+                const canEdit = canEditProject(p);
+
+                return `
+                <div class="project-card animate-in" style="animation-delay:${i * 0.05}s" data-id="${p.id}">
+                    ${canEdit ? `
+                    <div class="card-admin" style="display:flex">
+                        <button class="admin-btn" onclick="editProject('${p.id}')" title="Upraviť">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="admin-btn delete" onclick="deleteProject('${p.id}')" title="Zmazať">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </div>` : ''}
+                    <div class="card-emoji" onclick="openDetail('${p.id}')">${p.emoji || '🚀'}</div>
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <span class="card-category">${escapeHtml(p.category || 'Ostatné')}</span>
+                            <span class="card-status ${statusClass}">● ${statusLabel}</span>
+                        </div>
+                        <h3 class="card-title" onclick="openDetail('${p.id}')">${escapeHtml(p.title)}</h3>
+                        <p class="card-desc">${escapeHtml(p.description || '')}</p>
+                        <div class="card-footer">
+                            <span class="card-date">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                ${formatDate(p.date)}
+                            </span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="event.stopPropagation();copyLink('${p.id}')" title="Kopírovať link">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                </button>
+                                <button class="card-action-btn" onclick="event.stopPropagation();window.open('${escapeHtml(p.link)}','_blank')" title="Otvoriť">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // ============ RENDER TUTORIALS ============
+        function renderTutorials() {
+            const container = document.getElementById('tutorialsGrid');
+            const section = document.getElementById('tutorialsSection');
+
+            if (tutorials.length === 0 && !isAdmin) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = 'block';
+
+            container.innerHTML = tutorials.map((t, i) => {
+                const tags = (t.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+                return `
+                <div class="project-card tutorial-card animate-in" style="animation-delay:${i * 0.05}s">
+                    ${isAdmin ? `
+                    <div class="card-admin" style="display:flex">
+                        <button class="admin-btn" onclick="editTutorial('${t.id}')" title="Upraviť">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="admin-btn delete" onclick="deleteTutorial('${t.id}')" title="Zmazať">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </div>` : ''}
+                    <div class="card-emoji" onclick="openTutorialDetail('${t.id}')">${t.emoji || '📚'}</div>
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <span class="card-category" style="background:rgba(90,200,250,0.1);color:var(--info)">${escapeHtml(t.category || 'Tutoriál')}</span>
+                        </div>
+                        <h3 class="card-title" onclick="openTutorialDetail('${t.id}')">${escapeHtml(t.title)}</h3>
+                        <p class="card-desc">${escapeHtml(t.description || '')}</p>
+                        ${tags.length > 0 ? `<div class="card-tags">${tags.map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+                        <div class="card-footer">
+                            <span class="card-date">${formatDate(t.createdAt)}</span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="event.stopPropagation();openTutorialDetail('${t.id}')" title="Čítať">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // ============ RENDER COMMUNITY ============
+        function renderFilters() {
+            const community = getCommunityProjects();
+            const categories = ['Všetky', ...new Set(projects.filter(p => p.type === 'community' || (p.authorId !== users.find(u=>u.role==='admin')?.id)).map(p => p.category).filter(Boolean))];
+            const container = document.getElementById('filters');
+
+            if (categories.length <= 1 && community.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = categories.map(cat => `
+                <button class="filter-btn ${cat === currentFilter ? 'active' : ''}" onclick="setFilter('${cat}')">${cat}</button>
+            `).join('');
+        }
+
+        function setFilter(cat) {
+            currentFilter = cat;
+            renderFilters();
+            renderProjects();
+        }
+
+        function renderProjects() {
+            const grid = document.getElementById('projectsGrid');
+            const empty = document.getElementById('emptyState');
+            const filtered = getCommunityProjects();
+
+            grid.className = currentView === 'grid' ? 'projects-grid' : 'projects-list';
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                empty.style.display = 'block';
+                empty.querySelector('h3').textContent = searchQuery ? 'Žiadne výsledky' : 'Zatiaľ žiadne komunitné projekty';
+                empty.querySelector('p').textContent = searchQuery ? 'Skús iné vyhľadávanie' : 'Buď prvý kto pridá projekt!';
+                return;
+            }
+
+            empty.style.display = 'none';
+
+            grid.innerHTML = filtered.map((p, i) => {
+                const statusClass = p.status || 'live';
+                const statusLabel = { live: 'Live', beta: 'Beta', dev: 'Dev', archived: 'Archív' }[statusClass];
+                const tags = (p.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+                const isPinned = p.pinned || false;
+                const canEdit = canEditProject(p);
+
+                if (currentView === 'grid') {
+                    return `
+                    <div class="project-card ${isPinned ? 'pinned' : ''} animate-in" style="animation-delay:${i * 0.05}s" data-id="${p.id}">
+                        <div class="pin-badge">📌 Pripnuté</div>
+                        ${canEdit ? `
+                        <div class="card-admin" style="display:flex">
+                            <button class="admin-btn" onclick="togglePin('${p.id}')" title="${isPinned ? 'Odopnúť' : 'Pripnúť'}">
+                                <span style="font-size:0.9rem">${isPinned ? '📌' : '📍'}</span>
+                            </button>
+                            <button class="admin-btn" onclick="editProject('${p.id}')" title="Upraviť">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </button>
+                            <button class="admin-btn archive" onclick="archiveProject('${p.id}')" title="Archivovať">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                            </button>
+                            <button class="admin-btn delete" onclick="deleteProject('${p.id}')" title="Zmazať">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </div>` : ''}
+                        <div class="card-emoji" onclick="openDetail('${p.id}')">${p.emoji || '🚀'}</div>
+                        <div class="card-body">
+                            <div class="card-meta">
+                                <span class="card-category">${escapeHtml(p.category || 'Ostatné')}</span>
+                                <span class="card-status ${statusClass}">● ${statusLabel}</span>
+                                <span class="card-author">👤 ${escapeHtml(p.authorName || 'Neznámy')}</span>
+                            </div>
+                            <h3 class="card-title" onclick="openDetail('${p.id}')">${escapeHtml(p.title)}</h3>
+                            <p class="card-desc">${escapeHtml(p.description || '')}</p>
+                            ${tags.length > 0 ? `<div class="card-tags">${tags.map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+                            <div class="card-footer">
+                                <div style="display:flex;gap:0.75rem;align-items:center">
+                                    <span class="card-date">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        ${formatDate(p.date)}
+                                    </span>
+                                    <span class="card-views">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        ${p.views || 0}
+                                    </span>
+                                </div>
+                                <div class="card-actions">
+                                    ${canEdit ? `
+                                    <button class="card-action-btn pin-btn ${isPinned ? 'pinned' : ''}" onclick="event.stopPropagation();togglePin('${p.id}')" title="${isPinned ? 'Odopnúť' : 'Pripnúť'}">
+                                        ${isPinned ? '📌' : '📍'}
+                                    </button>` : ''}
+                                    <button class="card-action-btn" onclick="event.stopPropagation();copyLink('${p.id}')" title="Kopírovať link">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    </button>
+                                    <button class="card-action-btn" onclick="event.stopPropagation();window.open('${escapeHtml(p.link)}','_blank')" title="Otvoriť">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                } else {
+                    return `
+                    <div class="project-card list-view ${isPinned ? 'pinned' : ''} animate-in" style="animation-delay:${i * 0.05}s" data-id="${p.id}">
+                        <div class="pin-badge" style="top:0.5rem;left:0.5rem;font-size:0.6rem;padding:0.15rem 0.4rem">📌</div>
+                        ${canEdit ? `
+                        <div class="card-admin" style="display:flex">
+                            <button class="admin-btn" onclick="togglePin('${p.id}')" title="${isPinned ? 'Odopnúť' : 'Pripnúť'}">
+                                <span style="font-size:0.8rem">${isPinned ? '📌' : '📍'}</span>
+                            </button>
+                            <button class="admin-btn" onclick="editProject('${p.id}')" title="Upraviť">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </button>
+                            <button class="admin-btn archive" onclick="archiveProject('${p.id}')" title="Archivovať">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                            </button>
+                            <button class="admin-btn delete" onclick="deleteProject('${p.id}')" title="Zmazať">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </div>` : ''}
+                        <div class="card-emoji" onclick="openDetail('${p.id}')">${p.emoji || '🚀'}</div>
+                        <div class="card-body">
+                            <div class="card-meta">
+                                <span class="card-category">${escapeHtml(p.category || 'Ostatné')}</span>
+                                <span class="card-status ${statusClass}">● ${statusLabel}</span>
+                                <span class="card-author">👤 ${escapeHtml(p.authorName || 'Neznámy')}</span>
+                                ${tags.length > 0 ? tags.slice(0, 3).map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('') : ''}
+                            </div>
+                            <h3 class="card-title" onclick="openDetail('${p.id}')">${escapeHtml(p.title)}</h3>
+                            <p class="card-desc">${escapeHtml(p.description || '')}</p>
+                            <div class="card-footer">
+                                <div style="display:flex;gap:0.75rem;align-items:center">
+                                    <span class="card-date">${formatDate(p.date)}</span>
+                                    <span class="card-views">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        ${p.views || 0}
+                                    </span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="card-action-btn" onclick="event.stopPropagation();copyLink('${p.id}')" title="Kopírovať link">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    </button>
+                                    <button class="card-action-btn" onclick="event.stopPropagation();window.open('${escapeHtml(p.link)}','_blank')" title="Otvoriť">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        // ============ PIN ============
+        function togglePin(id) {
+            const p = projects.find(x => x.id === id);
+            if (!p) return;
+            if (!canEditProject(p)) {
+                showToast('Nemáš oprávnenie upraviť tento projekt!', 'error');
+                return;
+            }
+            p.pinned = !p.pinned;
+            saveProjects();
+            renderAdamProjects();
+            renderProjects();
+            showToast(p.pinned ? 'Projekt pripnutý!' : 'Projekt odopnutý.', 'success');
+        }
+
+        // ============ ARCHIVE ============
+        function archiveProject(id) {
+            const p = projects.find(x => x.id === id);
+            if (!p) return;
+            if (!canEditProject(p)) {
+                showToast('Nemáš oprávnenie upraviť tento projekt!', 'error');
+                return;
+            }
+            p.status = 'archived';
+            p.pinned = false;
+            saveProjects();
+            renderAdamProjects();
+            renderProjects();
+            showToast('Projekt archivovaný.', 'success');
+        }
+
+        // ============ COPY LINK ============
+        function copyLink(id) {
+            const p = projects.find(x => x.id === id);
+            if (!p) return;
+            navigator.clipboard.writeText(p.link).then(() => {
+                showToast('Link skopírovaný!', 'success');
+            }).catch(() => {
+                showToast('Nepodarilo sa skopírovať.', 'error');
+            });
+        }
+
+        // ============ DETAIL MODAL ============
+        function openDetail(id) {
+            const p = projects.find(x => x.id === id);
+            if (!p) return;
+
+            p.views = (p.views || 0) + 1;
+            saveProjects();
+            renderAdamProjects();
+            renderProjects();
+
+            currentDetailId = id;
+            document.getElementById('detailEmoji').textContent = p.emoji || '🚀';
+            document.getElementById('detailTitle').textContent = p.title;
+
+            const statusClass = p.status || 'live';
+            const statusLabel = { live: 'Live', beta: 'Beta', dev: 'Dev', archived: 'Archív' }[statusClass];
+            const tags = (p.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+
+            document.getElementById('detailMeta').innerHTML = `
+                <span class="card-category">${escapeHtml(p.category || 'Ostatné')}</span>
+                <span class="card-status ${statusClass}">● ${statusLabel}</span>
+                <span class="card-author">👤 ${escapeHtml(p.authorName || 'Neznámy')}</span>
+                ${tags.map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}
+                <span class="card-views">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    ${p.views || 0} zobrazení
+                </span>
+            `;
+
+            document.getElementById('detailDesc').textContent = p.description || 'Bez popisu.';
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function openDetailLink() {
+            const p = projects.find(x => x.id === currentDetailId);
+            if (p) window.open(p.link, '_blank');
+        }
+
+        function copyDetailLink() {
+            const p = projects.find(x => x.id === currentDetailId);
+            if (!p) return;
+            navigator.clipboard.writeText(p.link).then(() => {
+                showToast('Link skopírovaný!', 'success');
+            });
+        }
+
+        // ============ TUTORIAL CRUD ============
+        function openAddTutorialModal() {
+            if (!isAdmin) {
+                showToast('Iba admin môže pridávať tutoriály!', 'error');
+                return;
+            }
+            editingTutorialId = null;
+            tutEmojiPickerOpen = false;
+            document.getElementById('tutEmojiGrid').style.display = 'none';
+            document.getElementById('tutModalTitle').textContent = 'Nový tutoriál';
+            document.getElementById('tutorialForm').reset();
+            document.getElementById('tutorialId').value = '';
+            document.getElementById('tutorialEmoji').value = '📚';
+            document.getElementById('tutEmojiPreview').textContent = '📚';
+            document.getElementById('tutorialModal').classList.add('active');
+        }
+
+        function editTutorial(id) {
+            if (!isAdmin) return;
+            const t = tutorials.find(x => x.id === id);
+            if (!t) return;
+
+            editingTutorialId = id;
+            tutEmojiPickerOpen = false;
+            document.getElementById('tutEmojiGrid').style.display = 'none';
+            document.getElementById('tutModalTitle').textContent = 'Upraviť tutoriál';
+            document.getElementById('tutorialId').value = id;
+            document.getElementById('tutorialTitle').value = t.title;
+            document.getElementById('tutorialDesc').value = t.description || '';
+            document.getElementById('tutorialContent').value = t.content || '';
+            document.getElementById('tutorialCategory').value = t.category || 'Začiatočník';
+            document.getElementById('tutorialTags').value = t.tags || '';
+            document.getElementById('tutorialEmoji').value = t.emoji || '📚';
+            document.getElementById('tutEmojiPreview').textContent = t.emoji || '📚';
+            document.getElementById('tutorialModal').classList.add('active');
+        }
+
+        function saveTutorial(e) {
+            e.preventDefault();
+            if (!isAdmin) {
+                showToast('Iba admin môže ukladať tutoriály!', 'error');
+                return;
+            }
+
+            const title = document.getElementById('tutorialTitle').value.trim();
+            const description = document.getElementById('tutorialDesc').value.trim();
+            const content = document.getElementById('tutorialContent').value.trim();
+            const category = document.getElementById('tutorialCategory').value;
+            const tags = document.getElementById('tutorialTags').value.trim();
+            const emoji = document.getElementById('tutorialEmoji').value;
+
+            if (!title || !content) {
+                showToast('Vyplň povinné polia!', 'error');
+                return;
+            }
+
+            if (editingTutorialId) {
+                const idx = tutorials.findIndex(t => t.id === editingTutorialId);
+                if (idx !== -1) {
+                    tutorials[idx] = { ...tutorials[idx], title, description, content, category, tags, emoji, updatedAt: new Date().toISOString() };
+                    showToast('Tutoriál upravený!', 'success');
+                }
+            } else {
+                tutorials.push({
+                    id: 'tut_' + Date.now(),
+                    title, description, content, category, tags, emoji,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                });
+                showToast('Tutoriál pridaný!', 'success');
+                fireConfetti();
+            }
+
+            saveTutorials();
+            renderTutorials();
+            closeModal();
+        }
+
+        function deleteTutorial(id) {
+            if (!isAdmin) return;
+            if (!confirm('Naozaj chceš zmazať tento tutoriál?')) return;
+            tutorials = tutorials.filter(t => t.id !== id);
+            saveTutorials();
+            renderTutorials();
+            showToast('Tutoriál zmazaný.', 'success');
+        }
+
+        function openTutorialDetail(id) {
+            const t = tutorials.find(x => x.id === id);
+            if (!t) return;
+
+            document.getElementById('tutDetailEmoji').textContent = t.emoji || '📚';
+            document.getElementById('tutDetailTitle').textContent = t.title;
+
+            const tags = (t.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+            document.getElementById('tutDetailMeta').innerHTML = `
+                <span class="card-category" style="background:rgba(90,200,250,0.1);color:var(--info)">${escapeHtml(t.category || 'Tutoriál')}</span>
+                ${tags.map(tag => `<span class="card-tag">${escapeHtml(tag)}</span>`).join('')}
+                <span class="card-date">${formatDate(t.createdAt)}</span>
+            `;
+
+            document.getElementById('tutDetailContent').textContent = t.content || 'Bez obsahu.';
+            document.getElementById('tutorialDetailModal').classList.add('active');
+        }
+
+        // ============ EMOJI PICKERS ============
+        function renderEmojiPicker() {
+            const grid = document.getElementById('emojiGrid');
+            const currentEmoji = document.getElementById('projectEmoji').value;
+            grid.innerHTML = EMOJIS.map(emoji => `
+                <button type="button" class="emoji-item ${emoji === currentEmoji ? 'selected' : ''}" onclick="selectEmoji('${emoji}')">${emoji}</button>
+            `).join('');
+        }
+
+        function toggleEmojiPicker() {
+            const grid = document.getElementById('emojiGrid');
+            emojiPickerOpen = !emojiPickerOpen;
+            grid.style.display = emojiPickerOpen ? 'grid' : 'none';
+            if (emojiPickerOpen) renderEmojiPicker();
+        }
+
+        function selectEmoji(emoji) {
+            document.getElementById('projectEmoji').value = emoji;
+            document.getElementById('emojiPreview').textContent = emoji;
+            renderEmojiPicker();
+        }
+
+        function renderTutorialEmojiPicker() {
+            const grid = document.getElementById('tutEmojiGrid');
+            const currentEmoji = document.getElementById('tutorialEmoji').value;
+            grid.innerHTML = EMOJIS.map(emoji => `
+                <button type="button" class="emoji-item ${emoji === currentEmoji ? 'selected' : ''}" onclick="selectTutorialEmoji('${emoji}')">${emoji}</button>
+            `).join('');
+        }
+
+        function toggleTutorialEmojiPicker() {
+            const grid = document.getElementById('tutEmojiGrid');
+            tutEmojiPickerOpen = !tutEmojiPickerOpen;
+            grid.style.display = tutEmojiPickerOpen ? 'grid' : 'none';
+            if (tutEmojiPickerOpen) renderTutorialEmojiPicker();
+        }
+
+        function selectTutorialEmoji(emoji) {
+            document.getElementById('tutorialEmoji').value = emoji;
+            document.getElementById('tutEmojiPreview').textContent = emoji;
+            renderTutorialEmojiPicker();
+        }
+
+        // ============ THEME SELECTOR ============
+        function renderThemes() {
+            const grid = document.getElementById('themeGrid');
+            grid.innerHTML = THEMES.map(t => `
+                <div class="theme-option ${t.id === currentTheme ? 'active' : ''}"
+                     style="background: ${t.preview}"
+                     onclick="saveTheme('${t.id}')">
+                    <div class="theme-name">${t.name}</div>
+                </div>
+            `).join('');
+        }
+
+        function openThemeModal() {
+            renderThemes();
+            document.getElementById('themeModal').classList.add('active');
+        }
+
+        // ============ CRUD PROJECTS ============
+        function openAddModal() {
+            if (!currentUser) {
+                showToast('Pre pridanie projektu sa musíš prihlásiť!', 'error');
+                openAuth('login');
+                return;
+            }
+            editingId = null;
+            emojiPickerOpen = false;
+            document.getElementById('emojiGrid').style.display = 'none';
+            document.getElementById('modalTitle').textContent = 'Nový projekt';
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectId').value = '';
+            document.getElementById('projectEmoji').value = '🚀';
+            document.getElementById('emojiPreview').textContent = '🚀';
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function editProject(id) {
+            const p = projects.find(x => x.id === id);
+            if (!p) return;
+            if (!canEditProject(p)) {
+                showToast('Nemáš oprávnenie upraviť tento projekt!', 'error');
+                return;
+            }
+
+            editingId = id;
+            emojiPickerOpen = false;
+            document.getElementById('emojiGrid').style.display = 'none';
+            document.getElementById('modalTitle').textContent = 'Upraviť projekt';
+            document.getElementById('projectId').value = id;
+            document.getElementById('projectTitle').value = p.title;
+            document.getElementById('projectCategory').value = p.category || 'Ostatné';
+            document.getElementById('projectStatus').value = p.status || 'live';
+            document.getElementById('projectDesc').value = p.description || '';
+            document.getElementById('projectTags').value = p.tags || '';
+            document.getElementById('projectLink').value = p.link;
+            document.getElementById('projectEmoji').value = p.emoji || '🚀';
+            document.getElementById('emojiPreview').textContent = p.emoji || '🚀';
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function saveProject(e) {
+            e.preventDefault();
+
+            if (!currentUser) {
+                showToast('Pre uloženie sa musíš prihlásiť!', 'error');
+                return;
+            }
+
+            const title = document.getElementById('projectTitle').value.trim();
+            const category = document.getElementById('projectCategory').value;
+            const status = document.getElementById('projectStatus').value;
+            const description = document.getElementById('projectDesc').value.trim();
+            const tags = document.getElementById('projectTags').value.trim();
+            const link = document.getElementById('projectLink').value.trim();
+            const emoji = document.getElementById('projectEmoji').value;
+
+            if (!title || !link) {
+                showToast('Vyplň povinné polia!', 'error');
+                return;
+            }
+
+            if (editingId) {
+                const idx = projects.findIndex(p => p.id === editingId);
+                if (idx !== -1) {
+                    if (!canEditProject(projects[idx])) {
+                        showToast('Nemáš oprávnenie upraviť tento projekt!', 'error');
+                        return;
+                    }
+                    projects[idx] = { ...projects[idx], title, category, status, description, tags, link, emoji };
+                    showToast('Projekt upravený!', 'success');
+                }
+            } else {
+                projects.push({
+                    id: 'proj_' + Date.now(),
+                    title, category, status, description, tags, link, emoji,
+                    authorId: currentUser.id,
+                    authorName: currentUser.displayName || currentUser.username,
+                    type: isAdmin ? 'mine' : 'community',
+                    date: new Date().toISOString(),
+                    views: 0,
+                    pinned: false
+                });
+                showToast('Projekt pridaný!', 'success');
+                fireConfetti();
+            }
+
+            saveProjects();
+            renderAdamProjects();
+            renderFilters();
+            renderProjects();
+            closeModal();
+        }
+
+        function deleteProject(id) {
+            const p = projects.find(x => x.id === id);
+            if (!p) return;
+            if (!canEditProject(p)) {
+                showToast('Nemáš oprávnenie zmazať tento projekt!', 'error');
+                return;
+            }
+            if (!confirm('Naozaj chceš zmazať tento projekt?')) return;
+            projects = projects.filter(p => p.id !== id);
+            saveProjects();
+            renderAdamProjects();
+            renderFilters();
+            renderProjects();
+            showToast('Projekt zmazaný.', 'success');
+        }
+
+        // ============ CONFETTI ============
+        function fireConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = ['#76b900', '#2997ff', '#ff453a', '#ff9f0a', '#30d158', '#5ac8fa', '#ffd60a'];
+
+            for (let i = 0; i < 50; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                piece.style.width = (Math.random() * 8 + 4) + 'px';
+                piece.style.height = (Math.random() * 8 + 4) + 'px';
+                piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                piece.style.animationDelay = (Math.random() * 0.5) + 's';
+                container.appendChild(piece);
+
+                setTimeout(() => piece.remove(), 4000);
+            }
+        }
+
+        // ============ FEEDBACK / MESSAGES ============
+        function openFeedbackModal() {
+            document.getElementById('feedbackModal').classList.add('active');
+        }
+
+        function sendFeedback(e) {
+            e.preventDefault();
+
+            const type = document.getElementById('feedbackType').value;
+            const text = document.getElementById('feedbackText').value.trim();
+
+            if (!text) {
+                showToast('Napíš niečo do správy!', 'error');
+                return;
+            }
+
+            messages.push({
+                id: 'msg_' + Date.now(),
+                type,
+                text,
+                date: new Date().toISOString(),
+                read: false
+            });
+
+            saveMessages();
+            showToast('Ďakujem za nápad! 🙏', 'success');
+            document.getElementById('feedbackForm').reset();
+            closeModal();
+        }
+
+        function openMessagesModal() {
+            if (!isAdmin) {
+                showToast('Iba admin môže čítať správy!', 'error');
+                return;
+            }
+            renderMessages();
+            document.getElementById('messagesModal').classList.add('active');
+            messages.forEach(m => m.read = true);
+            saveMessages();
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messagesList');
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="messages-empty">
+                        <div style="font-size:2rem;margin-bottom:0.5rem">📭</div>
+                        Zatiaľ žiadne správy
+                    </div>
+                `;
+                return;
+            }
+
+            const sorted = [...messages].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            container.innerHTML = sorted.map(m => {
+                const typeLabels = { idea: 'Nápad', bug: 'Chyba', other: 'Iné' };
+                return `
+                    <div class="message-item ${!m.read ? 'unread' : ''}">
+                        <button class="message-delete" onclick="deleteMessage('${m.id}')" title="Zmazať">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                        <div class="message-header">
+                            <span class="message-type ${m.type}">${typeLabels[m.type]}</span>
+                            <span class="message-date">${formatDateTime(m.date)}</span>
+                        </div>
+                        <div class="message-text">${escapeHtml(m.text)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteMessage(id) {
+            if (!isAdmin) return;
+            if (!confirm('Zmazať túto správu?')) return;
+            messages = messages.filter(m => m.id !== id);
+            saveMessages();
+            renderMessages();
+            showToast('Správa zmazaná.', 'success');
+        }
+
+        // ============ BACKUP ============
+        function exportBackup() {
+            if (!isAdmin) {
+                showToast('Iba admin môže exportovať zálohu!', 'error');
+                return;
+            }
+            const data = {
+                version: 6,
+                exported: new Date().toISOString(),
+                theme: currentTheme,
+                users: users,
+                projects: projects,
+                tutorials: tutorials,
+                messages: messages
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `centralhub-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Záloha exportovaná!', 'success');
+        }
+
+        function importBackup(input) {
+            if (!isAdmin) {
+                showToast('Iba admin môže importovať zálohu!', 'error');
+                return;
+            }
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.projects && Array.isArray(data.projects)) {
+                        let confirmMsg = `Importovať ${data.projects.length} projektov`;
+                        if (data.tutorials) confirmMsg += `, ${data.tutorials.length} tutoriálov`;
+                        if (data.users) confirmMsg += `, ${data.users.length} používateľov`;
+                        confirmMsg += '? Toto prepíše existujúce dáta!';
+
+                        if (confirm(confirmMsg)) {
+                            projects = data.projects;
+                            if (data.tutorials) tutorials = data.tutorials;
+                            if (data.users) users = data.users;
+                            if (data.messages) messages = data.messages;
+                            if (data.theme) saveTheme(data.theme);
+
+                            // Re-migrate if needed
+                            const adminId = users.find(u => u.role === 'admin')?.id;
+                            projects.forEach(p => {
+                                if (!p.authorId) {
+                                    p.authorId = adminId || 'admin';
+                                    p.authorName = 'Adam';
+                                    p.type = 'mine';
+                                }
+                            });
+
+                            saveProjects();
+                            saveTutorials();
+                            saveUsers();
+                            saveMessages();
+                            renderAdamProjects();
+                            renderTutorials();
+                            renderFilters();
+                            renderProjects();
+                            updateMessagesBadge();
+                            showToast('Záloha importovaná!', 'success');
+                        }
+                    } else {
+                        showToast('Neplatný formát zálohy!', 'error');
+                    }
+                } catch(err) {
+                    showToast('Chyba pri čítaní súboru!', 'error');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        // ============ MODAL ============
+        function closeModal() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            emojiPickerOpen = false;
+            tutEmojiPickerOpen = false;
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+        });
+
+        // ============ UTILS ============
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            return d.toLocaleDateString('sk-SK', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function formatDateTime(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            return d.toLocaleDateString('sk-SK', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✓' : '✕';
+            toast.innerHTML = `<span style="font-weight:800;font-size:1.1rem">${icon}</span> ${escapeHtml(message)}`;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.add('show'));
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
